@@ -1,0 +1,117 @@
+.toolbar {
+    width: 250px;
+    background-color: #2a2a2a;
+    border-right: 2px solid #3a3a3a;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.toolbar h3 {
+    margin: 0 0 1rem 0;
+    color: #00ff88;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #3a3a3a;
+    padding-bottom: 0.5rem;
+}
+
+.tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    background-color: #4a4a4a;
+    border-color: #5a5a5a;
+}
+
+.tool-btn.active {
+    background-color: #00ff88;
+    color: #000000;
+    border-color: #00ff88;
+}
+
+.tool-icon {
+    font-size: 1.2rem;
+}
+
+.tool-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.action-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.75rem;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+}
+
+.action-btn:hover {
+    background-color: #4a4a4a;
+}
+
+.save-btn:hover {
+    background-color: #00cc6a;
+}
+
+.load-btn:hover {
+    background-color: #0066cc;
+}
+
+.share-btn:hover {
+    background-color: #cc6600;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.setting-item label {
+    font-size: 0.9rem;
+    color: #cccccc;
+}
+
+.setting-select {
+    padding: 0.5rem;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    border: 1px solid #5a5a5a;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
