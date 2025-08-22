@@ -17,28 +17,28 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
   };
 
   const loadMapBackground = useCallback(() => {
-    if (!canvas) return;
-    
-    canvas.clear();
-    
-    // Create dark background first
-    const mapBg = new Rect({
-      left: 0,
-      top: 0,
-      width: 800,
-      height: 600,
-      fill: '#1a1a1a',
-      selectable: false,
-      evented: false
-    });
-    canvas.add(mapBg);
+  if (!canvas) return;
+  
+  canvas.clear();
+  
+  // Create dark background first
+  const mapBg = new Rect({
+    left: 0,
+    top: 0,
+    width: 800,
+    height: 600,
+    fill: '#1a1a1a',
+    selectable: false,
+    evented: false
+  });
+  canvas.add(mapBg);
 
-    // Try to load the actual map image
-    const imagePath = mapImages[mapName];
-    if (imagePath) {
-      FabricImage.fromURL(imagePath, {
-        crossOrigin: 'anonymous'
-      }).then((img) => {
+  // Try to load the actual map image
+  const imagePath = mapImages[mapName];
+  if (imagePath) {
+    // Updated for Fabric.js v6 API
+    FabricImage.fromURL(imagePath)
+      .then((img) => {
         // Scale image to fit canvas while maintaining aspect ratio
         const canvasWidth = 800;
         const canvasHeight = 600;
@@ -57,7 +57,7 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
         });
         
         canvas.add(img);
-        canvas.sendToBack(img);
+        canvas.sendObjectToBack(img); // Updated method name for v6
         canvas.renderAll();
       }).catch((error) => {
         console.warn(`Could not load map image: ${imagePath}`, error);
@@ -71,18 +71,18 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
         });
         canvas.add(mapLabel);
       });
-    } else {
-      // Fallback when no image path is defined
-      const mapLabel = new Text(`${mapName.toUpperCase()} MAP`, {
-        left: 50,
-        top: 50,
-        fontSize: 24,
-        fill: '#ffffff',
-        selectable: false
-      });
-      canvas.add(mapLabel);
-    }
-  }, [canvas, mapName]);
+  } else {
+    // Fallback when no image path is defined
+    const mapLabel = new Text(`${mapName.toUpperCase()} MAP`, {
+      left: 50,
+      top: 50,
+      fontSize: 24,
+      fill: '#ffffff',
+      selectable: false
+    });
+    canvas.add(mapLabel);
+  }
+}, [canvas, mapName]);
 
   useEffect(() => {
     // Initialize Fabric.js canvas
