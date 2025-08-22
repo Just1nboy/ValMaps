@@ -19,6 +19,8 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
   const loadMapBackground = useCallback(() => {
   if (!canvas) return;
   
+  console.log('Loading map background for:', mapName); // Debug log
+  
   canvas.clear();
   
   // Create dark background first
@@ -35,10 +37,14 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
 
   // Try to load the actual map image
   const imagePath = mapImages[mapName];
+  console.log('Loading image from:', imagePath); // Debug log
+  
   if (imagePath) {
-    // Updated for Fabric.js v6 API
-    FabricImage.fromURL(imagePath)
+    // CRITICAL FIX: Add empty options object {}
+    FabricImage.fromURL(imagePath, {})
       .then((img) => {
+        console.log('Image loaded successfully:', img); // Debug log
+        
         // Scale image to fit canvas while maintaining aspect ratio
         const canvasWidth = 800;
         const canvasHeight = 600;
@@ -57,23 +63,28 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
         });
         
         canvas.add(img);
-        canvas.sendObjectToBack(img); // Updated method name for v6
+        canvas.sendObjectToBack(img);
         canvas.renderAll();
-      }).catch((error) => {
-        console.warn(`Could not load map image: ${imagePath}`, error);
+      })
+      .catch((error) => {
+        console.error('Failed to load map image:', imagePath, error); // Debug log
+        
         // Add fallback text if image fails to load
-        const mapLabel = new Text(`${mapName.toUpperCase()} MAP`, {
+        const mapLabel = new Text(`${mapName.toUpperCase()} MAP - FAILED TO LOAD`, {
           left: 50,
           top: 50,
           fontSize: 24,
-          fill: '#ffffff',
+          fill: '#ff0000', // Red text to indicate error
           selectable: false
         });
         canvas.add(mapLabel);
+        canvas.renderAll();
       });
   } else {
+    console.warn('No image path found for map:', mapName); // Debug log
+    
     // Fallback when no image path is defined
-    const mapLabel = new Text(`${mapName.toUpperCase()} MAP`, {
+    const mapLabel = new Text(`${mapName.toUpperCase()} MAP - NO PATH`, {
       left: 50,
       top: 50,
       fontSize: 24,
@@ -81,6 +92,7 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
       selectable: false
     });
     canvas.add(mapLabel);
+    canvas.renderAll();
   }
 }, [canvas, mapName]);
 
@@ -144,26 +156,23 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
       selectable: false
     });
 
-    const group = new Group([agent, agentNumber], {
-      left: pointer.x - 15,
-      top: pointer.y - 15
-    });
-
-    canvas.add(group);
+    canvas.add(agent);
+    canvas.add(agentNumber);
+    canvas.renderAll();
   };
 
   const addUtilityMarker = (pointer) => {
-    const utility = new Rect({
+    const utility = new Circle({
       left: pointer.x - 10,
       top: pointer.y - 10,
-      width: 20,
-      height: 20,
-      fill: '#ff6b35',
+      radius: 10,
+      fill: '#ffaa00',
       stroke: '#ffffff',
       strokeWidth: 2
     });
 
     canvas.add(utility);
+    canvas.renderAll();
   };
 
   const addTextAnnotation = (pointer) => {
@@ -172,53 +181,22 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
       top: pointer.y,
       fontSize: 16,
       fill: '#ffffff',
-      backgroundColor: 'rgba(0,0,0,0.5)'
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      padding: 5
     });
 
     canvas.add(text);
+    canvas.setActiveObject(text);
+    text.enterEditing();
+    canvas.renderAll();
   };
-
-  useEffect(() => {
-    if (canvas) {
-      canvas.on('mouse:down', handleCanvasClick);
-      
-      return () => {
-        canvas.off('mouse:down', handleCanvasClick);
-      };
-    }
-  }, [canvas, selectedTool]);
-
-  const clearCanvas = () => {
-    if (canvas) {
-      loadMapBackground(); // This will clear and reload the map background
-    }
-  };
-
-  const exportStrategy = () => {
-    if (canvas) {
-      const json = canvas.toJSON();
-      console.log('Strategy data:', json);
-      return json;
-    }
-  };
-
-  // Expose functions to parent component
-  React.useImperativeHandle(canvasRef, () => ({
-    clearCanvas,
-    exportStrategy
-  }));
 
   return (
-    <div className="strategy-canvas-container">
-      <canvas ref={canvasRef} />
-      <div className="canvas-controls">
-        <button onClick={clearCanvas} className="control-btn">
-          Clear
-        </button>
-        <button onClick={exportStrategy} className="control-btn">
-          Export
-        </button>
-      </div>
+    <div className="strategy-canvas">
+      <canvas 
+        ref={canvasRef}
+        onClick={handleCanvasClick}
+      />
     </div>
   );
 };
