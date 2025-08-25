@@ -94,48 +94,66 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
     }
   }, [canvas, mapName, loadMapBackground]);
 
-  const handleCanvasClick = (e) => {
-    if (!canvas) return;
+  const handleCanvasClick = (options) => {
+  if (!canvas) return;
 
-    const pointer = canvas.getPointer(e.e);
-    
-    switch (selectedTool) {
-      case 'agent':
-        addAgentMarker(pointer);
-        break;
-      case 'utility':
-        addUtilityMarker(pointer);
-        break;
-      case 'text':
-        addTextAnnotation(pointer);
-        break;
-      default:
-        break;
-    }
-  };
+  // Fix: Use options.e instead of e.e for the native event
+  const pointer = canvas.getPointer(options.e);
+  
+  switch (selectedTool) {
+    case 'agent':
+      addAgentMarker(pointer);
+      break;
+    case 'utility':
+      addUtilityMarker(pointer);
+      break;
+    case 'text':
+      addTextAnnotation(pointer);
+      break;
+    default:
+      break;
+  }
+};
 
   const addAgentMarker = (pointer) => {
-    const agent = new Circle({
-      left: pointer.x - 15,
-      top: pointer.y - 15,
-      radius: 15,
-      fill: '#00ff88',
-      stroke: '#ffffff',
-      strokeWidth: 2
-    });
+  // Create agent counter for numbering
+  const agentCount = canvas.getObjects().filter(obj => obj.type === 'group' && obj.agentMarker).length + 1;
+  
+  const agent = new Circle({
+    left: 0,
+    top: 0,
+    radius: 15,
+    fill: '#00ff88',
+    stroke: '#ffffff',
+    strokeWidth: 2,
+    originX: 'center',
+    originY: 'center'
+  });
 
-    const agentNumber = new Text('A', {
-      left: pointer.x - 5,
-      top: pointer.y - 8,
-      fontSize: 14,
-      fill: '#000000',
-      selectable: false
-    });
+  const agentNumber = new Text(`${agentCount}`, {
+    left: 0,
+    top: 0,
+    fontSize: 14,
+    fill: '#000000',
+    fontWeight: 'bold',
+    originX: 'center',
+    originY: 'center',
+    selectable: false
+  });
 
-    canvas.add(agent);
-    canvas.add(agentNumber);
-    canvas.renderAll();
-  };
+  const group = new Group([agent, agentNumber], {
+    left: pointer.x,
+    top: pointer.y,
+    originX: 'center',
+    originY: 'center'
+  });
+
+  // Mark it as an agent marker for counting purposes
+  group.set('agentMarker', true);
+
+  canvas.add(group);
+  canvas.renderAll();
+};
 
   const addUtilityMarker = (pointer) => {
     const utility = new Circle({

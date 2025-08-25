@@ -6,7 +6,7 @@ import MapSelector from './components/MapSelector/MapSelector';
 
 function App() {
   const [selectedMap, setSelectedMap] = useState('ascent');
-  const [selectedTool, setSelectedTool] = useState('move');
+  const [selectedTool, setSelectedTool] = useState('select');
   const [strategies, setStrategies] = useState([]);
 
   const handleSaveStrategy = (strategyData) => {
