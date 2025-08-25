@@ -57,6 +57,30 @@
     font-weight: 500;
 }
 
+/* Selected Agent Info */
+.selected-agent-info {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.selected-agent-label {
+    font-size: 0.75rem;
+    color: #999999;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.selected-agent-name {
+    font-size: 0.9rem;
+    color: #00ff88;
+    font-weight: bold;
+}
+
 .action-section {
     display: flex;
     flex-direction: column;

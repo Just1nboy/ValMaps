@@ -1,0 +1,183 @@
+.agent-selector {
+    position: fixed;
+    right: 270px;
+    /* Position next to toolbar */
+    top: 80px;
+    width: 320px;
+    max-height: 600px;
+    background-color: #2a2a2a;
+    border: 2px solid #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.agent-selector-header {
+    padding: 1rem;
+    border-bottom: 1px solid #3a3a3a;
+    background-color: #1f1f1f;
+}
+
+.agent-selector-header h4 {
+    margin: 0;
+    color: #00ff88;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.agent-selector-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.agent-role-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.role-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-duelist {
+    background-color: #ff4444;
+    color: white;
+}
+
+.role-controller {
+    background-color: #4488ff;
+    color: white;
+}
+
+.role-initiator {
+    background-color: #44ff44;
+    color: black;
+}
+
+.role-sentinel {
+    background-color: #ffaa44;
+    color: black;
+}
+
+.agent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+.agent-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 70px;
+    position: relative;
+    overflow: hidden;
+}
+
+.agent-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--agent-color, #ffffff);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.agent-btn:hover {
+    background-color: #4a4a4a;
+    border-color: var(--agent-color, #5a5a5a);
+    transform: translateY(-1px);
+}
+
+.agent-btn:hover::before {
+    opacity: 0.8;
+}
+
+.agent-btn.selected {
+    background-color: var(--agent-color, #00ff88);
+    color: #000000;
+    border-color: var(--agent-color, #00ff88);
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+.agent-btn.selected::before {
+    opacity: 1;
+    height: 100%;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%);
+}
+
+.agent-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.agent-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Scrollbar styling */
+.agent-selector::-webkit-scrollbar {
+    width: 6px;
+}
+
+.agent-selector::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 3px;
+}
+
+.agent-selector::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 3px;
+}
+
+.agent-selector::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}
+
+/* Animation for appearing */
+.agent-selector {
+    animation: slideInFromRight 0.2s ease-out;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
