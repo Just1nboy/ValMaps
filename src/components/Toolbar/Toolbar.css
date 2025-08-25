@@ -114,6 +114,10 @@
     background-color: #cc6600;
 }
 
+.clear-btn:hover {
+    background-color: #cc4400;
+}
+
 .settings-section {
     display: flex;
     flex-direction: column;
@@ -138,4 +142,51 @@
     border: 1px solid #5a5a5a;
     border-radius: 4px;
     font-size: 0.9rem;
+}
+
+/* Agent Count Section */
+.agent-count-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.agent-count-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.count-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #1a1a1a;
+    border-radius: 4px;
+}
+
+.count-label {
+    font-size: 0.8rem;
+    color: #cccccc;
+}
+
+.count-value {
+    font-size: 0.8rem;
+    color: #00ff88;
+    font-weight: bold;
+}
+
+.current-side-indicator {
+    text-align: center;
+    padding: 0.5rem;
+    background-color: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #ffffff;
+}
+
+.current-side-indicator strong {
+    color: #00ff88;
 }

@@ -1,22 +1,38 @@
 .agent-selector {
     position: fixed;
-    right: 270px;
-    /* Position next to toolbar */
-    top: 80px;
-    width: 320px;
-    max-height: 600px;
+    left: 250px;
+    /* Start right after the toolbar sidebar */
+    top: 60px;
+    /* Align with toolbar content */
+    width: 350px;
+    max-height: calc(100vh - 120px);
+    /* Leave space from top and bottom */
     background-color: #2a2a2a;
     border: 2px solid #3a3a3a;
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    border-left: none;
+    /* Seamlessly connect to sidebar */
+    border-radius: 0 8px 8px 0;
+    /* Only round right corners */
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     overflow-y: auto;
+    transform: translateX(-100%);
+    /* Start hidden */
+    transition: transform 0.3s ease;
+}
+
+.agent-selector.visible {
+    transform: translateX(0);
+    /* Slide in when visible */
 }
 
 .agent-selector-header {
     padding: 1rem;
     border-bottom: 1px solid #3a3a3a;
     background-color: #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .agent-selector-header h4 {
@@ -24,6 +40,32 @@
     color: #00ff88;
     font-size: 1.1rem;
     text-align: center;
+}
+
+.team-side-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.side-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.side-badge.blue {
+    background-color: #4488ff;
+    color: white;
+}
+
+.side-badge.red {
+    background-color: #ff4444;
+    color: white;
 }
 
 .agent-selector-content {
@@ -97,6 +139,19 @@
     overflow: hidden;
 }
 
+.agent-btn.disabled {
+    background-color: #2a2a2a;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.agent-btn.disabled:hover {
+    background-color: #2a2a2a;
+    border-color: transparent;
+    transform: none;
+}
+
 .agent-btn::before {
     content: '';
     position: absolute;
@@ -109,13 +164,13 @@
     transition: opacity 0.2s ease;
 }
 
-.agent-btn:hover {
+.agent-btn:not(.disabled):hover {
     background-color: #4a4a4a;
     border-color: var(--agent-color, #5a5a5a);
     transform: translateY(-1px);
 }
 
-.agent-btn:hover::before {
+.agent-btn:not(.disabled):hover::before {
     opacity: 0.8;
 }
 
@@ -146,6 +201,22 @@
     line-height: 1.2;
 }
 
+.agent-status {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    background-color: rgba(255, 68, 68, 0.8);
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
 /* Scrollbar styling */
 .agent-selector::-webkit-scrollbar {
     width: 6px;
@@ -165,19 +236,24 @@
     background: #5a5a5a;
 }
 
-/* Animation for appearing */
-.agent-selector {
-    animation: slideInFromRight 0.2s ease-out;
+/* Connection line to toolbar */
+.agent-selector::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #3a3a3a;
 }
 
-@keyframes slideInFromRight {
+/* Animation adjustments */
+@keyframes slideInFromLeft {
     from {
-        transform: translateX(20px);
-        opacity: 0;
+        transform: translateX(-100%);
     }
 
     to {
         transform: translateX(0);
-        opacity: 1;
     }
 }

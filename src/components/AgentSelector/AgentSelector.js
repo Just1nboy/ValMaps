@@ -1,7 +1,7 @@
 import React from 'react';
 import './AgentSelector.css';
 
-const AgentSelector = ({ selectedAgent, onAgentChange, isVisible }) => {
+const AgentSelector = ({ selectedAgent, onAgentChange, isVisible, teamSide, spawnedAgents }) => {
   if (!isVisible) return null;
 
   const agents = [
@@ -153,10 +153,29 @@ const AgentSelector = ({ selectedAgent, onAgentChange, isVisible }) => {
     return acc;
   }, {});
 
+  // Check if an agent is already spawned on the current team side
+  const isAgentSpawned = (agentId) => {
+    if (!spawnedAgents || !spawnedAgents[teamSide]) return false;
+    return spawnedAgents[teamSide].includes(agentId);
+  };
+
+  const handleAgentClick = (agentId) => {
+    if (isAgentSpawned(agentId)) {
+      // Agent already spawned, don't allow selection
+      return;
+    }
+    onAgentChange(agentId);
+  };
+
   return (
-    <div className="agent-selector">
+    <div className={`agent-selector ${isVisible ? 'visible' : ''}`}>
       <div className="agent-selector-header">
         <h4>Select Agent</h4>
+        <div className="team-side-indicator">
+          <span className={`side-badge ${teamSide}`}>
+            {teamSide === 'blue' ? '🔵 Attack' : '🔴 Defense'}
+          </span>
+        </div>
       </div>
       <div className="agent-selector-content">
         {roleOrder.map(role => (
@@ -167,20 +186,28 @@ const AgentSelector = ({ selectedAgent, onAgentChange, isVisible }) => {
               </span>
             </div>
             <div className="agent-grid">
-              {groupedAgents[role].map(agent => (
-                <button
-                  key={agent.id}
-                  className={`agent-btn ${selectedAgent === agent.id ? 'selected' : ''}`}
-                  onClick={() => onAgentChange(agent.id)}
-                  style={{
-                    '--agent-color': agent.color
-                  }}
-                  title={`${agent.name} (${agent.role})`}
-                >
-                  <span className="agent-icon">{agent.icon}</span>
-                  <span className="agent-name">{agent.name}</span>
-                </button>
-              ))}
+              {groupedAgents[role].map(agent => {
+                const isSpawned = isAgentSpawned(agent.id);
+                return (
+                  <button
+                    key={agent.id}
+                    className={`agent-btn ${selectedAgent === agent.id ? 'selected' : ''} ${isSpawned ? 'disabled' : ''}`}
+                    onClick={() => handleAgentClick(agent.id)}
+                    disabled={isSpawned}
+                    style={{
+                      '--agent-color': agent.color
+                    }}
+                    title={isSpawned ? 
+                      `${agent.name} (${agent.role}) - Already spawned on ${teamSide === 'blue' ? 'Attack' : 'Defense'}` :
+                      `${agent.name} (${agent.role})`
+                    }
+                  >
+                    <span className="agent-icon">{agent.icon}</span>
+                    <span className="agent-name">{agent.name}</span>
+                    {isSpawned && <span className="agent-status">✕</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}

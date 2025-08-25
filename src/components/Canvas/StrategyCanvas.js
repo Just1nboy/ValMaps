@@ -2,7 +2,15 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Canvas, Circle, Rect, Text, IText, Group, FabricImage } from 'fabric';
 import './StrategyCanvas.css';
 
-const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
+const StrategyCanvas = ({ 
+  mapName, 
+  selectedTool, 
+  selectedAgent, 
+  teamSide, 
+  spawnedAgents, 
+  onAgentSpawned, 
+  onAgentRemoved 
+}) => {
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
 
@@ -36,41 +44,33 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
     chamber: { name: 'Chamber', role: 'Sentinel', color: '#DAA520', icon: '🎯' }
   };
 
-  // Map backgrounds - make sure these files exist in public/assets/maps/
-  const mapImages = {
-    ascent: '/assets/maps/ascent.jpg',
-    bind: '/assets/maps/bind.jpg',
-    haven: '/assets/maps/haven.jpg',
-    split: '/assets/maps/split.jpg',
-    icebox: '/assets/maps/icebox.jpg',
-    breeze: '/assets/maps/breeze.jpg'
-  };
-
   const loadMapBackground = useCallback(() => {
-    if (!canvas) return;
+    if (!canvas || !mapName) return;
+
+    // Clear existing objects but keep any spawned agents
+    const existingObjects = canvas.getObjects();
+    const agentObjects = existingObjects.filter(obj => obj.agentMarker);
     
     canvas.clear();
+    
+    // Re-add agent objects
+    agentObjects.forEach(obj => canvas.add(obj));
 
-    // Try to load the actual map image FIRST
-    const imagePath = mapImages[mapName];
+    const imagePath = `/assets/maps/${mapName}.png`;
+    
     if (imagePath) {
-      console.log('Loading map background for:', mapName);
-      console.log('Loading image from:', imagePath);
-      
       FabricImage.fromURL(imagePath)
         .then((img) => {
-          console.log('Image loaded successfully:', img);
+          const canvasWidth = canvas.width;
+          const canvasHeight = canvas.height;
           
-          const canvasWidth = 800;
-          const canvasHeight = 600;
-          
+          // Scale image to fit canvas
           const scaleX = canvasWidth / img.width;
           const scaleY = canvasHeight / img.height;
           const scale = Math.min(scaleX, scaleY);
           
+          img.scale(scale);
           img.set({
-            scaleX: scale,
-            scaleY: scale,
             left: (canvasWidth - img.width * scale) / 2,
             top: (canvasHeight - img.height * scale) / 2,
             selectable: false,
@@ -78,8 +78,7 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
           });
           
           canvas.add(img);
-          // DON'T send to back - keep image on top
-          // canvas.sendObjectToBack(img); // Comment this out
+          canvas.sendObjectToBack(img);
           
           // Add dark background AFTER and send IT to back
           const mapBg = new Rect({
@@ -92,7 +91,7 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
             evented: false
           });
           canvas.add(mapBg);
-          canvas.sendObjectToBack(mapBg); // Send background to back instead
+          canvas.sendObjectToBack(mapBg);
           
           canvas.renderAll();
         }).catch((error) => {
@@ -135,7 +134,24 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
     }
   }, [canvas, mapName, loadMapBackground]);
 
-  // THIS IS THE FIXED PART - ADD FABRIC.JS EVENT LISTENER
+  // Handle object deletion - remove from spawned agents tracking
+  useEffect(() => {
+    if (!canvas) return;
+
+    const handleObjectRemoved = (e) => {
+      const obj = e.target;
+      if (obj.agentMarker && obj.agentType && obj.teamSide) {
+        onAgentRemoved(obj.agentType, obj.teamSide);
+      }
+    };
+
+    canvas.on('object:removed', handleObjectRemoved);
+
+    return () => {
+      canvas.off('object:removed', handleObjectRemoved);
+    };
+  }, [canvas, onAgentRemoved]);
+
   useEffect(() => {
     if (!canvas) return;
 
@@ -170,11 +186,24 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
     return () => {
       canvas.off('mouse:up', handleCanvasClick);
     };
-  }, [canvas, selectedTool, selectedAgent]); // Re-run when canvas, selectedTool, or selectedAgent changes
+  }, [canvas, selectedTool, selectedAgent, teamSide, spawnedAgents]);
 
   const addAgentMarker = (pointer) => {
     if (!selectedAgent || !agentData[selectedAgent]) {
       console.warn('No agent selected or invalid agent');
+      return;
+    }
+
+    // Check if agent is already spawned on current team side
+    if (spawnedAgents[teamSide] && spawnedAgents[teamSide].includes(selectedAgent)) {
+      console.warn(`${agentData[selectedAgent].name} is already spawned on ${teamSide} side`);
+      // You could add a visual feedback here like a toast notification
+      return;
+    }
+
+    // Check if team already has 5 agents
+    if (spawnedAgents[teamSide] && spawnedAgents[teamSide].length >= 5) {
+      console.warn(`${teamSide} team already has 5 agents spawned`);
       return;
     }
 
@@ -186,7 +215,7 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
       top: 0,
       radius: 18,
       fill: agent.color,
-      stroke: '#ffffff',
+      stroke: teamSide === 'blue' ? '#4488ff' : '#ff4444', // Team border color
       strokeWidth: 3,
       originX: 'center',
       originY: 'center'
@@ -214,11 +243,21 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
       fontWeight: 'bold',
       originX: 'center',
       originY: 'center',
-      backgroundColor: 'rgba(0,0,0,0.7)',
+      backgroundColor: teamSide === 'blue' ? 'rgba(68, 136, 255, 0.8)' : 'rgba(255, 68, 68, 0.8)',
       padding: 2
     });
 
-    const group = new Group([agentCircle, agentText, agentLabel], {
+    // Create team indicator
+    const teamIndicator = new Text(teamSide === 'blue' ? '🔵' : '🔴', {
+      left: 15,
+      top: -15,
+      fontSize: 10,
+      originX: 'center',
+      originY: 'center',
+      selectable: false
+    });
+
+    const group = new Group([agentCircle, agentText, agentLabel, teamIndicator], {
       left: pointer.x,
       top: pointer.y,
       originX: 'center',
@@ -230,13 +269,17 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
       agentMarker: true,
       agentType: selectedAgent,
       agentName: agent.name,
-      agentRole: agent.role
+      agentRole: agent.role,
+      teamSide: teamSide
     });
 
     canvas.add(group);
     canvas.renderAll();
 
-    console.log(`Added ${agent.name} (${agent.role}) at position:`, pointer);
+    // Add to spawned agents tracking
+    onAgentSpawned(selectedAgent, teamSide);
+
+    console.log(`Added ${agent.name} (${agent.role}) to ${teamSide} team at position:`, pointer);
   };
 
   const addUtilityMarker = (pointer) => {
@@ -273,7 +316,6 @@ const StrategyCanvas = ({ mapName, selectedTool, selectedAgent }) => {
     <div className="strategy-canvas">
       <canvas 
         ref={canvasRef}
-        // REMOVED: onClick={handleCanvasClick} - This was the problem!
       />
     </div>
   );
