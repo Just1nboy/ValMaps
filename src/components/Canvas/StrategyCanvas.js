@@ -19,33 +19,18 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
   const loadMapBackground = useCallback(() => {
   if (!canvas) return;
   
-  console.log('Loading map background for:', mapName); // Debug log
-  
   canvas.clear();
-  
-  // Create dark background first
-  const mapBg = new Rect({
-    left: 0,
-    top: 0,
-    width: 800,
-    height: 600,
-    fill: '#1a1a1a',
-    selectable: false,
-    evented: false
-  });
-  canvas.add(mapBg);
 
-  // Try to load the actual map image
+  // Try to load the actual map image FIRST
   const imagePath = mapImages[mapName];
-  console.log('Loading image from:', imagePath); // Debug log
-  
   if (imagePath) {
-    // CRITICAL FIX: Add empty options object {}
-    FabricImage.fromURL(imagePath, {})
+    console.log('Loading map background for:', mapName);
+    console.log('Loading image from:', imagePath);
+    
+    FabricImage.fromURL(imagePath)
       .then((img) => {
-        console.log('Image loaded successfully:', img); // Debug log
+        console.log('Image loaded successfully:', img);
         
-        // Scale image to fit canvas while maintaining aspect ratio
         const canvasWidth = 800;
         const canvasHeight = 600;
         
@@ -63,36 +48,27 @@ const StrategyCanvas = ({ mapName, selectedTool }) => {
         });
         
         canvas.add(img);
-        canvas.sendObjectToBack(img);
-        canvas.renderAll();
-      })
-      .catch((error) => {
-        console.error('Failed to load map image:', imagePath, error); // Debug log
+        // DON'T send to back - keep image on top
+        // canvas.sendObjectToBack(img); // Comment this out
         
-        // Add fallback text if image fails to load
-        const mapLabel = new Text(`${mapName.toUpperCase()} MAP - FAILED TO LOAD`, {
-          left: 50,
-          top: 50,
-          fontSize: 24,
-          fill: '#ff0000', // Red text to indicate error
-          selectable: false
+        // Add dark background AFTER and send IT to back
+        const mapBg = new Rect({
+          left: 0,
+          top: 0,
+          width: canvasWidth,
+          height: canvasHeight,
+          fill: '#1a1a1a',
+          selectable: false,
+          evented: false
         });
-        canvas.add(mapLabel);
+        canvas.add(mapBg);
+        canvas.sendObjectToBack(mapBg); // Send background to back instead
+        
         canvas.renderAll();
+      }).catch((error) => {
+        console.warn(`Could not load map image: ${imagePath}`, error);
+        // ... rest of error handling
       });
-  } else {
-    console.warn('No image path found for map:', mapName); // Debug log
-    
-    // Fallback when no image path is defined
-    const mapLabel = new Text(`${mapName.toUpperCase()} MAP - NO PATH`, {
-      left: 50,
-      top: 50,
-      fontSize: 24,
-      fill: '#ffffff',
-      selectable: false
-    });
-    canvas.add(mapLabel);
-    canvas.renderAll();
   }
 }, [canvas, mapName]);
 
