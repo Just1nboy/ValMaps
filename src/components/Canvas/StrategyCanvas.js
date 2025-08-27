@@ -56,7 +56,7 @@ const StrategyCanvas = ({
     // Re-add agent objects
     agentObjects.forEach(obj => canvas.add(obj));
 
-    const imagePath = `/assets/maps/${mapName}.png`;
+    const imagePath = `/assets/maps/${mapName}.jpg`;
     
     if (imagePath) {
       FabricImage.fromURL(imagePath)
