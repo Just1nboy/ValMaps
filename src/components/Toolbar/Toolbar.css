@@ -102,6 +102,17 @@
     background-color: #4a4a4a;
 }
 
+.action-btn.disabled,
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.action-btn.disabled:hover,
+.action-btn:disabled:hover {
+    background-color: #3a3a3a;
+}
+
 .save-btn:hover {
     background-color: #00cc6a;
 }

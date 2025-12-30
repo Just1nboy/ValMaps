@@ -35,3 +35,73 @@
   background-color: #2a2a2a;
   padding: 1rem;
 }
+
+/* Notifications */
+.notifications-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+  font-size: 0.9rem;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-success {
+  background-color: #00cc6a;
+  color: #000;
+}
+
+.notification-error {
+  background-color: #ff4444;
+  color: #fff;
+}
+
+.notification-warning {
+  background-color: #ffaa00;
+  color: #000;
+}
+
+.notification-info {
+  background-color: #4488ff;
+  color: #fff;
+}
+
+.notification-close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 12px;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}

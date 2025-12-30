@@ -2,16 +2,19 @@ import React from 'react';
 import AgentSelector from '../AgentSelector/AgentSelector';
 import './Toolbar.css';
 
-const Toolbar = ({ 
-  selectedTool, 
-  onToolChange, 
-  onSaveStrategy, 
-  selectedAgent, 
+const Toolbar = ({
+  selectedTool,
+  onToolChange,
+  onSaveStrategy,
+  onLoadStrategy,
+  onShareStrategy,
+  selectedAgent,
   onAgentChange,
   teamSide,
   onTeamSideChange,
   spawnedAgents,
-  onClearSpawnedAgents
+  onClearSpawnedAgents,
+  hasStrategies
 }) => {
   const tools = [
     { id: 'select', name: 'Select', icon: '↖' },
@@ -63,18 +66,23 @@ const Toolbar = ({
           <button className="action-btn save-btn" onClick={onSaveStrategy}>
             💾 Save Strategy
           </button>
-          <button className="action-btn load-btn">
+          <button
+            className={`action-btn load-btn ${!hasStrategies ? 'disabled' : ''}`}
+            onClick={onLoadStrategy}
+            disabled={!hasStrategies}
+            title={hasStrategies ? 'Load most recent strategy' : 'No saved strategies'}
+          >
             📁 Load Strategy
           </button>
-          <button className="action-btn share-btn">
-            📤 Share
+          <button className="action-btn share-btn" onClick={onShareStrategy}>
+            📤 Export Image
           </button>
-          <button 
-            className="action-btn clear-btn" 
+          <button
+            className="action-btn clear-btn"
             onClick={onClearSpawnedAgents}
-            title="Clear all spawned agents"
+            title="Clear all objects from canvas"
           >
-            🧹 Clear Agents
+            🧹 Clear Canvas
           </button>
         </div>
 

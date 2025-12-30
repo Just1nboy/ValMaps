@@ -1,18 +1,22 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Canvas, Circle, Rect, Text, IText, Group, FabricImage } from 'fabric';
+import React, { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { Canvas, Circle, Rect, Text, IText, Group, FabricImage, Line } from 'fabric';
 import './StrategyCanvas.css';
 
-const StrategyCanvas = ({ 
-  mapName, 
-  selectedTool, 
-  selectedAgent, 
-  teamSide, 
-  spawnedAgents, 
-  onAgentSpawned, 
-  onAgentRemoved 
-}) => {
+const StrategyCanvas = forwardRef(({
+  mapName,
+  selectedTool,
+  selectedAgent,
+  teamSide,
+  spawnedAgents,
+  onAgentSpawned,
+  onAgentRemoved,
+  onNotification
+}, ref) => {
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
+  const isDrawingLine = useRef(false);
+  const lineStartPoint = useRef(null);
+  const currentLine = useRef(null);
 
   // Agent data with colors and display info
   const agentData = {
@@ -96,17 +100,48 @@ const StrategyCanvas = ({
           canvas.renderAll();
         }).catch((error) => {
           console.warn(`Could not load map image: ${imagePath}`, error);
-          // Add fallback background
+          const canvasWidth = canvas.width;
+          const canvasHeight = canvas.height;
+
+          // Add fallback background with gradient
           const mapBg = new Rect({
             left: 0,
             top: 0,
-            width: 800,
-            height: 600,
+            width: canvasWidth,
+            height: canvasHeight,
             fill: '#1a1a1a',
             selectable: false,
             evented: false
           });
           canvas.add(mapBg);
+
+          // Add map name as text overlay
+          const mapNameText = new Text(mapName.charAt(0).toUpperCase() + mapName.slice(1), {
+            left: canvasWidth / 2,
+            top: canvasHeight / 2 - 20,
+            fontSize: 48,
+            fill: '#3a3a3a',
+            fontWeight: 'bold',
+            originX: 'center',
+            originY: 'center',
+            selectable: false,
+            evented: false
+          });
+          canvas.add(mapNameText);
+
+          // Add hint text
+          const hintText = new Text('Map image not available', {
+            left: canvasWidth / 2,
+            top: canvasHeight / 2 + 30,
+            fontSize: 14,
+            fill: '#555555',
+            originX: 'center',
+            originY: 'center',
+            selectable: false,
+            evented: false
+          });
+          canvas.add(hintText);
+
           canvas.renderAll();
         });
     }
@@ -134,6 +169,31 @@ const StrategyCanvas = ({
     }
   }, [canvas, mapName, loadMapBackground]);
 
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    getCanvasJSON: () => {
+      if (!canvas) return null;
+      return canvas.toJSON(['agentMarker', 'agentType', 'agentName', 'agentRole', 'teamSide']);
+    },
+    loadCanvasJSON: (json) => {
+      if (!canvas || !json) return;
+      canvas.loadFromJSON(json, () => {
+        canvas.renderAll();
+      });
+    },
+    exportAsImage: () => {
+      if (!canvas) return null;
+      return canvas.toDataURL({ format: 'png', quality: 1 });
+    },
+    clearCanvas: () => {
+      if (!canvas) return;
+      const objects = canvas.getObjects();
+      const nonBackgroundObjects = objects.filter(obj => obj.selectable !== false);
+      nonBackgroundObjects.forEach(obj => canvas.remove(obj));
+      canvas.renderAll();
+    }
+  }));
+
   // Handle object deletion - remove from spawned agents tracking
   useEffect(() => {
     if (!canvas) return;
@@ -152,18 +212,110 @@ const StrategyCanvas = ({
     };
   }, [canvas, onAgentRemoved]);
 
+  // Configure canvas based on selected tool
+  useEffect(() => {
+    if (!canvas) return;
+
+    // Reset canvas state for tool change
+    canvas.isDrawingMode = false;
+    canvas.selection = selectedTool === 'select';
+    canvas.defaultCursor = 'default';
+
+    // Configure based on tool
+    switch (selectedTool) {
+      case 'select':
+        canvas.getObjects().forEach(obj => {
+          if (obj.selectable !== false) {
+            obj.set({ selectable: true, evented: true });
+          }
+        });
+        break;
+      case 'erase':
+        canvas.defaultCursor = 'pointer';
+        canvas.getObjects().forEach(obj => {
+          if (obj.selectable !== false) {
+            obj.set({ selectable: false, evented: true });
+          }
+        });
+        break;
+      case 'line':
+        canvas.defaultCursor = 'crosshair';
+        canvas.getObjects().forEach(obj => {
+          if (obj.selectable !== false) {
+            obj.set({ selectable: false, evented: false });
+          }
+        });
+        break;
+      default:
+        canvas.getObjects().forEach(obj => {
+          if (obj.selectable !== false) {
+            obj.set({ selectable: false, evented: false });
+          }
+        });
+        break;
+    }
+    canvas.renderAll();
+  }, [canvas, selectedTool]);
+
+  // Handle mouse events for drawing lines
+  useEffect(() => {
+    if (!canvas) return;
+
+    const handleMouseDown = (options) => {
+      if (selectedTool === 'line') {
+        isDrawingLine.current = true;
+        const pointer = canvas.getPointer(options.e);
+        lineStartPoint.current = pointer;
+
+        currentLine.current = new Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+          stroke: teamSide === 'blue' ? '#4488ff' : '#ff4444',
+          strokeWidth: 3,
+          selectable: false,
+          evented: false,
+          strokeLineCap: 'round'
+        });
+        canvas.add(currentLine.current);
+      }
+    };
+
+    const handleMouseMove = (options) => {
+      if (selectedTool === 'line' && isDrawingLine.current && currentLine.current) {
+        const pointer = canvas.getPointer(options.e);
+        currentLine.current.set({ x2: pointer.x, y2: pointer.y });
+        canvas.renderAll();
+      }
+    };
+
+    const handleMouseUp = (options) => {
+      if (selectedTool === 'line' && isDrawingLine.current) {
+        isDrawingLine.current = false;
+        if (currentLine.current) {
+          currentLine.current.set({ selectable: true, evented: true });
+          canvas.renderAll();
+        }
+        currentLine.current = null;
+        lineStartPoint.current = null;
+      }
+    };
+
+    canvas.on('mouse:down', handleMouseDown);
+    canvas.on('mouse:move', handleMouseMove);
+    canvas.on('mouse:up', handleMouseUp);
+
+    return () => {
+      canvas.off('mouse:down', handleMouseDown);
+      canvas.off('mouse:move', handleMouseMove);
+      canvas.off('mouse:up', handleMouseUp);
+    };
+  }, [canvas, selectedTool, teamSide]);
+
+  // Handle canvas clicks for various tools
   useEffect(() => {
     if (!canvas) return;
 
     const handleCanvasClick = (options) => {
-      // Only handle clicks if we have a tool selected that needs it
-      if (!['agent', 'utility', 'text'].includes(selectedTool)) {
-        return;
-      }
-
-      // Get the pointer position
       const pointer = canvas.getPointer(options.e);
-      
+
       switch (selectedTool) {
         case 'agent':
           addAgentMarker(pointer);
@@ -174,36 +326,59 @@ const StrategyCanvas = ({
         case 'text':
           addTextAnnotation(pointer);
           break;
+        case 'erase':
+          // Erase is handled by object click
+          break;
         default:
           break;
       }
     };
 
-    // Add the event listener to the Fabric.js canvas
-    canvas.on('mouse:up', handleCanvasClick);
+    const handleObjectClick = (options) => {
+      if (selectedTool === 'erase' && options.target) {
+        const obj = options.target;
+        // Don't delete background elements
+        if (obj.selectable === false && !obj.agentMarker) return;
 
-    // Cleanup function to remove event listener
+        canvas.remove(obj);
+        canvas.renderAll();
+
+        if (onNotification) {
+          onNotification('Object deleted', 'info');
+        }
+      }
+    };
+
+    canvas.on('mouse:up', handleCanvasClick);
+    canvas.on('mouse:down', handleObjectClick);
+
     return () => {
       canvas.off('mouse:up', handleCanvasClick);
+      canvas.off('mouse:down', handleObjectClick);
     };
-  }, [canvas, selectedTool, selectedAgent, teamSide, spawnedAgents]);
+  }, [canvas, selectedTool, selectedAgent, teamSide, spawnedAgents, onNotification]);
 
   const addAgentMarker = (pointer) => {
     if (!selectedAgent || !agentData[selectedAgent]) {
-      console.warn('No agent selected or invalid agent');
+      if (onNotification) {
+        onNotification('Please select an agent first', 'warning');
+      }
       return;
     }
 
     // Check if agent is already spawned on current team side
     if (spawnedAgents[teamSide] && spawnedAgents[teamSide].includes(selectedAgent)) {
-      console.warn(`${agentData[selectedAgent].name} is already spawned on ${teamSide} side`);
-      // You could add a visual feedback here like a toast notification
+      if (onNotification) {
+        onNotification(`${agentData[selectedAgent].name} is already on ${teamSide === 'blue' ? 'Attack' : 'Defense'} team`, 'warning');
+      }
       return;
     }
 
     // Check if team already has 5 agents
     if (spawnedAgents[teamSide] && spawnedAgents[teamSide].length >= 5) {
-      console.warn(`${teamSide} team already has 5 agents spawned`);
+      if (onNotification) {
+        onNotification(`${teamSide === 'blue' ? 'Attack' : 'Defense'} team already has 5 agents`, 'warning');
+      }
       return;
     }
 
@@ -279,7 +454,9 @@ const StrategyCanvas = ({
     // Add to spawned agents tracking
     onAgentSpawned(selectedAgent, teamSide);
 
-    console.log(`Added ${agent.name} (${agent.role}) to ${teamSide} team at position:`, pointer);
+    if (onNotification) {
+      onNotification(`${agent.name} added to ${teamSide === 'blue' ? 'Attack' : 'Defense'} team`, 'success');
+    }
   };
 
   const addUtilityMarker = (pointer) => {
@@ -314,11 +491,11 @@ const StrategyCanvas = ({
 
   return (
     <div className="strategy-canvas">
-      <canvas 
+      <canvas
         ref={canvasRef}
       />
     </div>
   );
-};
+});
 
 export default StrategyCanvas;
