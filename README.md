@@ -1,70 +1,50 @@
-# Getting Started with Create React App
+# ValMaps — Valorant Strategy Planner
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A tactics board for Valorant. Pick a map, place agents and their abilities, draw movement
+arrows and notes, then save the play or export it as an image to share with your team.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **13 competitive maps** (Ascent, Bind, Breeze, Haven, Icebox, Split, Fracture, Pearl,
+  Lotus, Sunset, Abyss, Corrode, Summit) with real minimap images.
+- **Full agent roster** (29 agents) grouped by role, with portrait icons. Up to 5 agents
+  per side, one of each, tracked separately for Attack (blue) and Defense (red).
+- **Ability markers** for every agent's real kit — smokes, walls, mollies, flashes,
+  recon, traps, heals and ultimates each render with a distinct shape and size.
+- **Drawing tools**: movement arrows (drag to draw), text notes, an eraser, and a select
+  tool for moving/rotating markers. `Delete`/`Backspace` removes the selection.
+- **Save / load strategies** to localStorage (map, round type, and every marker), and
+  **export the board as a PNG**.
 
-### `npm start`
+## How the tools behave
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+**Select is the default, and the board always comes back to it.** Placement tools are
+one-shot: drop an agent, ability, arrow, or note and the tool snaps straight back to
+Select, so your next click drags markers instead of accidentally placing another one.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **`Esc`** returns to Select at any time.
+- **Clicking the active tool again** toggles it off, back to Select.
+- **Erase is the exception** — it stays on so you can clear several markers in a row;
+  switch tools (or press `Esc`) when you're done.
 
-### `npm test`
+| Tool | What it does |
+| --- | --- |
+| Select | Click to select, drag to move (or rotate walls). Multi-select supported. The default mode. |
+| Agent | Click the map to place the agent chosen in the side panel, then back to Select |
+| Ability | Pick any agent's ability in the side panel, click the map to place it, then back to Select |
+| Arrow | Drag on the map to draw a movement arrow (colored by team side), then back to Select |
+| Text | Click the map to drop an editable note; returns to Select once you finish typing |
+| Erase | Click markers to delete them — stays active until you switch tools |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting started
 
-### `npm run build`
+```bash
+npm install
+npm start        # dev server on http://localhost:3000
+npm test         # unit tests
+npm run build    # production build in ./build
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Map minimaps and agent icons live in `public/assets/` and were sourced from the
+community [valorant-api.com](https://valorant-api.com) media CDN. Game assets are the
+property of Riot Games; this is an unofficial fan tool.

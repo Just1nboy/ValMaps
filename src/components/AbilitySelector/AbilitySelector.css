@@ -1,0 +1,184 @@
+.ability-selector {
+    position: fixed;
+    left: 250px;
+    top: 60px;
+    width: 320px;
+    max-height: calc(100vh - 120px);
+    background-color: #2a2a2a;
+    border: 2px solid #3a3a3a;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.ability-selector-header {
+    padding: 1rem;
+    border-bottom: 1px solid #3a3a3a;
+    background-color: #1f1f1f;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.ability-selector-header h4 {
+    margin: 0;
+    color: #00ff88;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.ability-selector-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ability-agent-label {
+    font-size: 0.8rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ability-agent-select {
+    padding: 0.5rem;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    border: 1px solid #5a5a5a;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.ability-agent-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background-color: #1a1a1a;
+    border-radius: 6px;
+}
+
+.ability-agent-portrait {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #0f1923;
+    border: 2px solid #3a3a3a;
+}
+
+.ability-agent-name {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.ability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ability-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+
+.ability-btn:hover {
+    background-color: #4a4a4a;
+    border-color: var(--ability-color, #5a5a5a);
+}
+
+.ability-btn.selected {
+    border-color: var(--ability-color, #00ff88);
+    background-color: #1a1a1a;
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.15);
+}
+
+.ability-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background-color: var(--ability-color, #5a5a5a);
+    color: #10131a;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.ability-icon {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+
+.ability-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.ability-draw-tag {
+    flex-shrink: 0;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    background-color: var(--ability-color, #5a5a5a);
+    color: #10131a;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ability-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ability-type {
+    font-size: 0.7rem;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ability-hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #888888;
+    line-height: 1.4;
+}
+
+.ability-selector::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ability-selector::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 3px;
+}
+
+.ability-selector::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 3px;
+}

@@ -57,6 +57,16 @@
     font-weight: 500;
 }
 
+.tool-hint {
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background-color: #1a1a1a;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #999999;
+    line-height: 1.4;
+}
+
 /* Selected Agent Info */
 .selected-agent-info {
     margin-top: 1rem;

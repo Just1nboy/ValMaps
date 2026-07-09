@@ -27,11 +27,12 @@
   height: calc(100vh - 80px);
 }
 
-.canvas-container {
+.canvas-area {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #2a2a2a;
   padding: 1rem;
+  overflow: auto;
 }

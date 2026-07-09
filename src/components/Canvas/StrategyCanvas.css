@@ -6,31 +6,13 @@
 }
 
 .strategy-canvas-container canvas {
+    border-radius: 8px;
+}
+
+/* Fabric wraps the canvas in its own .canvas-container div; style the wrapper. */
+.strategy-canvas-container .canvas-container {
     border: 2px solid #3a3a3a;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    cursor: crosshair;
-}
-
-.canvas-controls {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.control-btn {
-    padding: 0.5rem 1rem;
-    background-color: #3a3a3a;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.control-btn:hover {
-    background-color: #4a4a4a;
-}
-
-.control-btn:active {
-    background-color: #5a5a5a;
+    overflow: hidden;
 }
